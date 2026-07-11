@@ -136,7 +136,7 @@ canvas{width:min(100vw,106.6667vh);max-width:1120px;height:auto;aspect-ratio:16/
       <button class="menuBtn enchantBtn" data-screen="enchant"><span>Encantar</span></button>
       <button class="menuBtn" data-screen="book"><span>Livro</span></button>
       <button class="menuBtn" data-screen="settings"><span>Configurações</span></button>
-    </div><div class="version">v4.2 • loja rework, itens e encantamentos</div></div>
+    </div><div class="version">v7.5 • capítulos bloqueados + saves preservados</div></div>
   </div>
   <div id="menuRight"></div>
 </div>
@@ -1585,6 +1585,256 @@ $('quitBtn').onclick=goMenu;$('deathMenuBtn').onclick=goMenu;$('chapterMenuBtn')
     }
   };
 }
+
+
+/* --- UPDATE v7.5: capítulos bloqueados por padrão, preservando desbloqueios antigos --- */
+(function(){
+  const MIG='v7_5_capitulos_bloqueados_preserva_save';
+  function chapterMaxV75(){return Math.max.apply(null,Object.keys(chapters).map(Number).filter(Boolean))}
+  function ensureProgressSlotsV75(){
+    save.progress=save.progress||{};
+    for(let c=1;c<=chapterMaxV75();c++)if(save.progress[c]==null)save.progress[c]=0;
+  }
+  function ensureChapterUnlocksV75(){
+    ensureProgressSlotsV75();
+    const max=chapterMaxV75();
+    if(!save.chapterUnlocksV75||save.chapterUnlockMigrationV75!==MIG){
+      const old=save.chapterUnlocksV75||save.chapterUnlocks||{};
+      const unlocks={1:true};
+      for(let c=2;c<=max;c++){
+        const previousComplete=(save.progress[c-1]||0)>=(chapters[c-1]&&chapters[c-1].ecos||999999);
+        const alreadyPlayed=(save.progress[c]||0)>0;
+        unlocks[c]=!!(old[c]||old[String(c)]||previousComplete||alreadyPlayed);
+      }
+      // Se alguém já tinha entrado em um capítulo mais avançado antes da update,
+      // mantém também o caminho anterior aberto para não quebrar o save.
+      for(let c=max;c>=2;c--){
+        if(unlocks[c])for(let j=1;j<c;j++)unlocks[j]=true;
+      }
+      save.chapterUnlocksV75=unlocks;
+      save.chapterUnlockMigrationV75=MIG;
+      saveGame();
+    }
+    // Depois da migração, novos capítulos só abrem por conclusão real do anterior.
+    let changed=false;
+    save.chapterUnlocksV75[1]=true;
+    for(let c=2;c<=max;c++){
+      const previousComplete=(save.progress[c-1]||0)>=(chapters[c-1]&&chapters[c-1].ecos||999999);
+      if(previousComplete&&!save.chapterUnlocksV75[c]){save.chapterUnlocksV75[c]=true;changed=true}
+    }
+    if(changed)saveGame();
+  }
+  function chapterRewardV75(c,e){
+    if(typeof expReward==='function'&&(c===6||c===7))return expReward(c,e);
+    if(c===5&&typeof gardenReward==='function')return gardenReward(e);
+    return 10+c*3+(save.settings&&save.settings.difficulty==='pesadelo'?6:0);
+  }
+  ensureChapterUnlocksV75();
+  chapterUnlocked=function(c){
+    if(typeof modeBypassUnlock!=='undefined'&&modeBypassUnlock)return true;
+    ensureChapterUnlocksV75();
+    return !!(save.chapterUnlocksV75&&save.chapterUnlocksV75[c]);
+  };
+  nextEcoForChapter=function(c){
+    ensureChapterUnlocksV75();
+    const ch=chapters[c];
+    if(!ch||!chapterUnlocked(c))return 1;
+    return Math.min((save.progress[c]||0)+1,ch.ecos);
+  };
+  ecoUnlocked=function(c,e){
+    if(typeof modeBypassUnlock!=='undefined'&&modeBypassUnlock)return true;
+    ensureChapterUnlocksV75();
+    const ch=chapters[c];
+    if(!ch||!chapterUnlocked(c))return false;
+    return e>=1&&e<=nextEcoForChapter(c);
+  };
+  nextPlayableChapter=function(){
+    ensureChapterUnlocksV75();
+    const max=chapterMaxV75();
+    for(let c=1;c<=max;c++){
+      if(chapterUnlocked(c)&&(save.progress[c]||0)<chapters[c].ecos)return c;
+    }
+    for(let c=max;c>=1;c--)if(chapterUnlocked(c))return c;
+    return 1;
+  };
+  const __v75StartEco=startEco;
+  startEco=function(c,e){
+    if(!(typeof modeBypassUnlock!=='undefined'&&modeBypassUnlock)&&!ecoUnlocked(c,e)){
+      toast('Capítulo/Eco bloqueado');
+      return false;
+    }
+    return __v75StartEco(c,e);
+  };
+  const __v75EcoComplete=ecoComplete;
+  ecoComplete=function(){
+    const before=JSON.stringify(save.chapterUnlocksV75||{});
+    const ret=__v75EcoComplete();
+    ensureChapterUnlocksV75();
+    if(JSON.stringify(save.chapterUnlocksV75||{})!==before)toast('Novo capítulo desbloqueado!');
+    return ret;
+  };
+  openEcoPicker=function(c,fromPause=false){
+    ensureChapterUnlocksV75();
+    ecoPickerFromPause=fromPause;
+    currentChapter=c;
+    const modal=ensureEcoPicker(),ch=chapters[c],done=save.progress[c]||0,unlocked=chapterUnlocked(c);
+    $('ecoPickerTitle').textContent='Capítulo '+c;
+    $('ecoPickerDesc').textContent=unlocked
+      ?(ch.name+' — avance em ordem. Progresso salvo: '+done+'/'+ch.ecos+'.')
+      :(ch.name+' — bloqueado. Complete o capítulo anterior para liberar.');
+    $('ecoNextBtn').disabled=!unlocked;
+    $('ecoFirstBtn').disabled=!unlocked;
+    $('ecoNextBtn').onclick=()=>{const next=nextEcoForChapter(c);startEcoFromPicker(c,next)};
+    $('ecoFirstBtn').onclick=()=>startEcoFromPicker(c,1);
+    const grid=$('ecoGrid');grid.innerHTML='';
+    for(let e=1;e<=ch.ecos;e++){
+      const can=ecoUnlocked(c,e),boss=isBossEco(c,e),btn=document.createElement('button');
+      btn.className='ecoBtn'+(e<=done?' done':'')+(can?'':' locked');
+      btn.disabled=!can;
+      const label=e<=done?'<em>concluído</em>':(can?'<em>próximo +'+chapterRewardV75(c,e)+' VC</em>':'<em>bloqueado</em>');
+      btn.innerHTML='<span class="big">'+(boss?'☠':(can?'◆':'🔒'))+'</span>Eco '+e+(boss?'<span class="boss">BOSS</span>':'')+label;
+      btn.onclick=()=>startEcoFromPicker(c,e);
+      grid.appendChild(btn);
+    }
+    modal.classList.remove('hidden');
+  };
+  if(typeof renderMap==='function'){
+    const __v75RenderMap=renderMap;
+    renderMap=function(){
+      ensureChapterUnlocksV75();
+      __v75RenderMap();
+      const hint=document.querySelector('#chapterMap .mapHint p');
+      if(hint)hint.innerHTML='Progressão restaurada: capítulos ficam bloqueados por padrão, mas saves antigos preservam os capítulos já desbloqueados. Próximo destino salvo: <strong>'+nextPlayableLabel()+'</strong>.';
+    };
+  }
+})();
+
+
+/* --- UPDATE v7.6: progressão exata por Eco
+   Jogador novo: somente Capítulo 1 / Eco 1.
+   Save antigo: mantém o maior capítulo/eco já alcançado pelo progresso salvo, sem liberar capítulos de teste. --- */
+(function(){
+  const MIG='v7_6_progressao_exata_eco1';
+  function chapterMaxV76(){return Math.max.apply(null,Object.keys(chapters).map(Number).filter(Boolean))}
+  function normalizeProgressV76(){
+    save.progress=save.progress||{};
+    const max=chapterMaxV76();
+    for(let c=1;c<=max;c++){
+      const total=chapters[c]&&chapters[c].ecos?chapters[c].ecos:1;
+      let v=Number(save.progress[c]||0);
+      if(!Number.isFinite(v))v=0;
+      save.progress[c]=clamp(Math.floor(v),0,total);
+    }
+  }
+  function computeUnlocksV76(){
+    normalizeProgressV76();
+    const max=chapterMaxV76(), unlocks={1:true};
+    for(let c=2;c<=max;c++){
+      const prev=chapters[c-1];
+      const previousComplete=!!(prev&&(save.progress[c-1]||0)>=prev.ecos);
+      const alreadyReachedThisChapter=(save.progress[c]||0)>0;
+      // Importante: não herdamos unlocks de versões de teste que abriram capítulos inteiros.
+      // Só preservamos avanço real salvo: completou algo no capítulo, ou completou o capítulo anterior.
+      unlocks[c]=!!(previousComplete||alreadyReachedThisChapter);
+    }
+    return unlocks;
+  }
+  function syncUnlocksV76(){
+    const next=computeUnlocksV76();
+    const old=JSON.stringify(save.chapterUnlocksV76||{});
+    const cur=JSON.stringify(next);
+    if(old!==cur||save.chapterUnlockMigrationV76!==MIG){
+      save.chapterUnlocksV76=next;
+      save.chapterUnlockMigrationV76=MIG;
+      saveGame();
+    }
+  }
+  function rewardV76(c,e){
+    if(typeof expReward==='function'&&(c===6||c===7))return expReward(c,e);
+    if(c===5&&typeof gardenReward==='function')return gardenReward(e);
+    return 10+c*3+(save.settings&&save.settings.difficulty==='pesadelo'?6:0);
+  }
+  syncUnlocksV76();
+  chapterUnlocked=function(c){
+    if(typeof modeBypassUnlock!=='undefined'&&modeBypassUnlock)return true;
+    syncUnlocksV76();
+    return !!(save.chapterUnlocksV76&&save.chapterUnlocksV76[c]);
+  };
+  nextEcoForChapter=function(c){
+    syncUnlocksV76();
+    const ch=chapters[c];
+    if(!ch||!chapterUnlocked(c))return 1;
+    return clamp((save.progress[c]||0)+1,1,ch.ecos);
+  };
+  ecoUnlocked=function(c,e){
+    if(typeof modeBypassUnlock!=='undefined'&&modeBypassUnlock)return true;
+    syncUnlocksV76();
+    const ch=chapters[c];
+    if(!ch||!chapterUnlocked(c))return false;
+    // Eco novo libera um por vez; Ecos já concluídos continuam clicáveis.
+    return e>=1&&e<=nextEcoForChapter(c);
+  };
+  nextPlayableChapter=function(){
+    syncUnlocksV76();
+    const max=chapterMaxV76();
+    for(let c=1;c<=max;c++){
+      if(chapterUnlocked(c)&&(save.progress[c]||0)<chapters[c].ecos)return c;
+    }
+    for(let c=max;c>=1;c--)if(chapterUnlocked(c))return c;
+    return 1;
+  };
+  const __v76StartEco=startEco;
+  startEco=function(c,e){
+    if(!(typeof modeBypassUnlock!=='undefined'&&modeBypassUnlock)&&!ecoUnlocked(c,e)){
+      toast('Eco bloqueado — avance em ordem');
+      return false;
+    }
+    return __v76StartEco(c,e);
+  };
+  const __v76EcoComplete=ecoComplete;
+  ecoComplete=function(){
+    const before=JSON.stringify(computeUnlocksV76());
+    const ret=__v76EcoComplete();
+    syncUnlocksV76();
+    const after=JSON.stringify(save.chapterUnlocksV76||{});
+    if(before!==after)toast('Novo capítulo desbloqueado!');
+    return ret;
+  };
+  openEcoPicker=function(c,fromPause=false){
+    syncUnlocksV76();
+    ecoPickerFromPause=fromPause;
+    currentChapter=c;
+    const modal=ensureEcoPicker(),ch=chapters[c],done=save.progress[c]||0,unlocked=chapterUnlocked(c);
+    $('ecoPickerTitle').textContent='Capítulo '+c;
+    $('ecoPickerDesc').textContent=unlocked
+      ?(ch.name+' — progressão exata: só o próximo Eco fica liberado. Progresso salvo: '+done+'/'+ch.ecos+'.')
+      :(ch.name+' — bloqueado. Complete o capítulo anterior para liberar.');
+    $('ecoNextBtn').disabled=!unlocked;
+    $('ecoFirstBtn').disabled=!unlocked;
+    $('ecoNextBtn').onclick=()=>{const next=nextEcoForChapter(c);startEcoFromPicker(c,next)};
+    $('ecoFirstBtn').onclick=()=>startEcoFromPicker(c,1);
+    const grid=$('ecoGrid');grid.innerHTML='';
+    for(let e=1;e<=ch.ecos;e++){
+      const can=ecoUnlocked(c,e),boss=isBossEco(c,e),btn=document.createElement('button');
+      btn.className='ecoBtn'+(e<=done?' done':'')+(can?'':' locked');
+      btn.disabled=!can;
+      const label=e<=done?'<em>concluído</em>':(can?'<em>próximo +'+rewardV76(c,e)+' VC</em>':'<em>bloqueado</em>');
+      btn.innerHTML='<span class="big">'+(boss?'☠':(can?'◆':'🔒'))+'</span>Eco '+e+(boss?'<span class="boss">BOSS</span>':'')+label;
+      btn.onclick=()=>startEcoFromPicker(c,e);
+      grid.appendChild(btn);
+    }
+    modal.classList.remove('hidden');
+  };
+  if(typeof renderMap==='function'){
+    const __v76RenderMap=renderMap;
+    renderMap=function(){
+      syncUnlocksV76();
+      __v76RenderMap();
+      const hint=document.querySelector('#chapterMap .mapHint p');
+      if(hint)hint.innerHTML='Progressão exata ativada: jogador novo começa só no <strong>Cap. 1 • Eco 1</strong>. Saves antigos mantêm o capítulo/eco já alcançado. Próximo destino: <strong>'+nextPlayableLabel()+'</strong>.';
+    };
+  }
+})();
 
 // initial background level for menu canvas
 level={walls:[],orbs:[],enemies:[],puzzles:[],portal:{x:0,y:0,active:false}};makeSky(rng(123));level=null;goMenu();requestAnimationFrame(loop);
