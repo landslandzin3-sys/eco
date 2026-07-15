@@ -615,6 +615,44 @@ body.eodAdaptiveLow .floatEntity:nth-child(n+9),body.eodAdaptiveLow .mapSpark:nt
 @media(max-width:760px){.itemCard,.bookEntity,.entityCard,.modeCard,.eodCosCard,.eodSettingGroup{contain-intrinsic-size:340px}}
 </style>
 
+
+<style id="eodFishFallCutscenePatch">
+/* V9.1.2 — cutscene sem texto, com o peixinho protagonista em queda real */
+#chapterFallCutscene{--fallPrimary:#83edff;--fallSecondary:#ffe58a;cursor:default;background:radial-gradient(ellipse at 50% 18%,#244d93 0 1.5%,#0a1133 19%,#02020c 66%,#000 100%)}
+#chapterFallCutscene .fallTunnel{inset:-38%;animation:fishFallCamera .82s linear infinite;transform-origin:50% 38%}
+#chapterFallCutscene .fallLights i{height:220px;animation-duration:.86s;filter:drop-shadow(0 0 18px #83edff)}
+#chapterFallCutscene .fallActor{left:50%;top:30%;width:190px;height:128px;transform:translate(-50%,-50%);animation:fishHeroFall 3.65s cubic-bezier(.36,.03,.21,.98) forwards;filter:drop-shadow(0 0 24px rgba(131,237,255,.58)) drop-shadow(0 0 48px rgba(255,120,200,.22));will-change:transform,top}
+#chapterFallCutscene .fallFish{position:absolute;inset:0;transform-origin:50% 50%;animation:fishTumble .72s ease-in-out infinite alternate}
+#chapterFallCutscene .fallFishGlow{position:absolute;left:48%;top:49%;width:150px;height:92px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.82),color-mix(in srgb,var(--fallPrimary) 30%,transparent) 28%,color-mix(in srgb,var(--fallSecondary) 16%,transparent) 50%,transparent 73%);filter:blur(3px);opacity:.7;animation:fishGlowPulse .48s ease-in-out infinite alternate}
+#chapterFallCutscene .fallFishBody{position:absolute;left:52%;top:50%;width:92px;height:56px;transform:translate(-50%,-50%);border-radius:58% 45% 48% 55%/54% 50% 50% 46%;background:radial-gradient(circle at 35% 24%,#fff 0 8%,#faffff 14%,color-mix(in srgb,var(--fallPrimary) 58%,#fff) 42%,color-mix(in srgb,var(--fallPrimary) 48%,#2c2f78) 72%,#20214c 100%);border:2px solid rgba(255,255,255,.68);box-shadow:0 0 24px rgba(131,237,255,.82) inset,0 0 28px rgba(131,237,255,.48)}
+#chapterFallCutscene .fallFishBody:before{content:"";position:absolute;left:20px;top:-15px;width:36px;height:22px;border-radius:70% 25% 65% 30%;background:linear-gradient(155deg,rgba(255,255,255,.9),color-mix(in srgb,var(--fallPrimary) 55%,transparent) 42%,color-mix(in srgb,var(--fallPrimary) 45%,#24265f));transform:rotate(-17deg);transform-origin:bottom right;animation:fishFinTop .32s ease-in-out infinite alternate}
+#chapterFallCutscene .fallFishBody:after{content:"";position:absolute;left:26px;bottom:-14px;width:39px;height:21px;border-radius:28% 70% 30% 65%;background:linear-gradient(25deg,color-mix(in srgb,var(--fallPrimary) 45%,#25275f),color-mix(in srgb,var(--fallPrimary) 68%,transparent) 58%,rgba(255,255,255,.86));transform:rotate(13deg);transform-origin:top right;animation:fishFinBottom .36s ease-in-out infinite alternate}
+#chapterFallCutscene .fallFishTail{position:absolute;left:9px;top:50%;width:62px;height:82px;transform:translateY(-50%);transform-origin:90% 50%;animation:fishTailFlap .22s ease-in-out infinite alternate}
+#chapterFallCutscene .fallFishTail:before,#chapterFallCutscene .fallFishTail:after{content:"";position:absolute;right:0;width:61px;height:43px;background:linear-gradient(135deg,rgba(255,255,255,.94),var(--fallPrimary) 30%,color-mix(in srgb,var(--fallPrimary) 45%,#35357d) 62%,color-mix(in srgb,var(--fallSecondary) 70%,transparent));border:1px solid rgba(255,255,255,.44);box-shadow:0 0 18px rgba(131,237,255,.42)}
+#chapterFallCutscene .fallFishTail:before{bottom:38px;clip-path:polygon(100% 72%,12% 0,0 78%,48% 100%);transform:rotate(8deg)}
+#chapterFallCutscene .fallFishTail:after{top:38px;clip-path:polygon(100% 28%,12% 100%,0 22%,48% 0);transform:rotate(-8deg)}
+#chapterFallCutscene .fallFishEye{position:absolute;right:25px;top:19px;width:16px;height:18px;border-radius:50%;background:#06101d;border:3px solid #fff;box-shadow:0 0 11px #fff}
+#chapterFallCutscene .fallFishEye:after{content:"";position:absolute;right:1px;top:1px;width:5px;height:5px;border-radius:50%;background:#fff}
+#chapterFallCutscene .fallFishMouth{position:absolute;right:-4px;top:31px;width:15px;height:9px;border-bottom:3px solid rgba(7,10,28,.95);border-radius:50%;transform:rotate(-8deg)}
+#chapterFallCutscene .fallFishBubbles{position:absolute;inset:0;pointer-events:none}
+#chapterFallCutscene .fallFishBubbles i{position:absolute;left:55%;top:45%;width:9px;height:9px;border:2px solid rgba(209,250,255,.78);border-radius:50%;box-shadow:0 0 11px rgba(131,237,255,.68);animation:fishBubble 1.1s linear infinite;opacity:0}
+#chapterFallCutscene .fallFishBubbles i:nth-child(2){animation-delay:-.24s;width:6px;height:6px}
+#chapterFallCutscene .fallFishBubbles i:nth-child(3){animation-delay:-.52s;width:13px;height:13px}
+#chapterFallCutscene .fallFishBubbles i:nth-child(4){animation-delay:-.78s;width:7px;height:7px}
+#chapterFallCutscene .fallHole{bottom:-14%;animation:fishHoleRush 4s cubic-bezier(.13,.72,.12,1) forwards}
+#chapterFallCutscene .fallCopy,#chapterFallCutscene .fallSkip,#chapterFallCutscene .fallHead,#chapterFallCutscene .fallBody,#chapterFallCutscene .fallLegs{display:none!important}
+@keyframes fishFallCamera{from{transform:scale(.72) rotate(-3deg)}to{transform:scale(1.18) rotate(10deg)}}
+@keyframes fishHeroFall{0%{top:22%;transform:translate(-50%,-50%) scale(1.18) rotate(-18deg)}28%{top:33%;transform:translate(-48%,-50%) scale(1.04) rotate(16deg)}58%{top:48%;transform:translate(-52%,-50%) scale(.82) rotate(-11deg)}82%{top:65%;transform:translate(-49%,-50%) scale(.56) rotate(18deg)}100%{top:83%;transform:translate(-50%,-50%) scale(.12) rotate(54deg);opacity:.08}}
+@keyframes fishTumble{from{transform:translateX(-5px) rotate(-5deg)}to{transform:translateX(6px) rotate(5deg)}}
+@keyframes fishGlowPulse{to{opacity:.38;transform:translate(-50%,-50%) scale(1.18)}}
+@keyframes fishTailFlap{from{transform:translateY(-50%) rotate(-19deg) scaleY(.84)}to{transform:translateY(-50%) rotate(18deg) scaleY(1.08)}}
+@keyframes fishFinTop{to{transform:rotate(-31deg) scaleY(.72)}}
+@keyframes fishFinBottom{to{transform:rotate(27deg) scaleY(.76)}}
+@keyframes fishBubble{0%{opacity:0;transform:translate(0,0) scale(.45)}18%{opacity:.8}100%{opacity:0;transform:translate(-95px,-88px) scale(1.4)}}
+@keyframes fishHoleRush{0%{transform:translateX(-50%) scale(.22);opacity:.2}58%{transform:translateX(-50%) scale(.88);opacity:.92}100%{transform:translateX(-50%) scale(1.72);opacity:1}}
+@media(max-width:650px){#chapterFallCutscene .fallActor{width:148px;height:102px}#chapterFallCutscene .fallFish{transform:scale(.82)}#chapterFallCutscene .fallHole{width:110vw}}
+</style>
+
 </head>
 <body>
 <div id="splashIntro"><div class="splashBox"><small>Noite dos Ecos</small><b>A game powered by<br>shit experiences</b><span>clique para pular</span></div></div>
@@ -3978,7 +4016,7 @@ function expTypes(c){return c===6?['choirWisp','glassBishop','bellCrawler','alta
 /* ===== EOD V9 INTEGRATED UPDATE ===== */
 (function(){
 'use strict';
-const UPDATE_VERSION='v9.1 • Otimização Adaptativa, Entidades e Dimensões';
+const UPDATE_VERSION='v9.1.2 • Portal e Puzzles Corrigidos';
 const NEW_TYPES=new Set(['chronosEntity','seekerEntity','soundMakerEntity']);
 let chronosAttract=0,soundPanic=0,entityAlertTimer=0,pickupBursts=[],fpsFrames=0,fpsValue=0,lastFpsAt=performance.now();
 
@@ -4104,7 +4142,7 @@ function rebuildEarlyChapter(c,e){
   if(c===3){[[820,1570,520,32],[1600,1320,32,430],[2530,1180,520,32],[1180,520,32,500],[2100,510,32,520],[3220,650,32,680],[520,1280,360,32]].forEach((w,i)=>addWall(level.walls,...w,{vineWall:1,curve:i%2}))}
   player.x=layouts.spawn[0];player.y=layouts.spawn[1];player.spawnX=player.x;player.spawnY=player.y;player.vx=player.vy=0;level.portal.x=layouts.portal[0];level.portal.y=layouts.portal[1];level.portal.r=38;level.portal.active=false;
   assignPositions(level.orbs,layouts.pts,22);assignPositions(level.enemies,layouts.pts.slice().reverse(),34);
-  const puzzleCount=Math.min(5,2+Math.floor(e/3));level.puzzles=[];for(let i=0;i<puzzleCount;i++){const p=layouts.pts[(i*3+2)%layouts.pts.length];level.puzzles.push({x:p[0]+55,y:p[1]-45,r:34,done:false,hold:0,type:(i+c+e)%6,label:['Runas do Bosque','Engrenagem Afogada','Raiz de Vigília'][c-1]+' '+(i+1)})}level.puzzleNeed=puzzleCount;level.puzzleDone=0;
+  const puzzleCount=c;level.puzzles=[];for(let i=0;i<puzzleCount;i++){const p=layouts.pts[(i*3+2)%layouts.pts.length];level.puzzles.push({x:p[0]+55,y:p[1]-45,r:34,done:false,hold:0,type:(i+c+e)%6,label:['Runas do Bosque','Engrenagem Afogada','Raiz de Vigília'][c-1]+' '+(i+1)})}level.puzzleNeed=puzzleCount;level.puzzleDone=0;
   if(level.boss){const p=layouts.pts[layouts.pts.length-2];level.boss.x=p[0];level.boss.y=p[1]}
   decorateOrbs();
 }
@@ -4183,7 +4221,7 @@ updateHud=function(){oldUpdateHudV9();if(modeRun&&modeRun.v9Dimensions){const cu
 const oldDrawOrbArrowsV9=drawOrbArrows;
 drawOrbArrows=function(){if(save.settings.orbGuide===false)return;return oldDrawOrbArrowsV9()};
 
-function startChapterFall(from,to){if(!save.settings.screenFx||save.settings.reducedMotion)return finishChapterFall(from,to);chapterOverlay.classList.add('hidden');let old=$('chapterFallCutscene');if(old)old.remove();const el=document.createElement('div');el.id='chapterFallCutscene';let lights='';for(let i=0;i<22;i++)lights+=`<i style="left:${(i*47)%100}%;animation-delay:${-(i*.11)}s;opacity:${.25+(i%5)*.12}"></i>`;el.innerHTML=`<div class="fallTunnel"></div><div class="fallLights">${lights}</div><div class="fallActor"><div class="fallHead"></div><div class="fallBody"></div><div class="fallLegs"></div></div><div class="fallHole"></div><div class="fallCopy"><small>Capítulo ${from} concluído</small><h2>Caindo para ${chapters[to].name}</h2><p>A câmera perde o chão junto com o protagonista.</p></div><div class="fallSkip">clique para atravessar</div>`;document.body.appendChild(el);let done=false;const finish=()=>{if(done)return;done=true;el.remove();finishChapterFall(from,to)};setTimeout(finish,save.settings.reducedMotion?600:4400);setTimeout(()=>el.onclick=finish,650)}
+function startChapterFall(from,to){if(!save.settings.screenFx||save.settings.reducedMotion)return finishChapterFall(from,to);chapterOverlay.classList.add('hidden');let old=$('chapterFallCutscene');if(old)old.remove();const el=document.createElement('div');el.id='chapterFallCutscene';const fallColors=typeof cosmeticColors==='function'?cosmeticColors():{primary:'#83edff',secondary:'#ffe58a'};el.style.setProperty('--fallPrimary',fallColors.primary||'#83edff');el.style.setProperty('--fallSecondary',fallColors.secondary||'#ffe58a');let lights='';for(let i=0;i<26;i++)lights+=`<i style="left:${(i*43)%100}%;animation-delay:${-(i*.075)}s;opacity:${.22+(i%6)*.10}"></i>`;el.innerHTML=`<div class="fallTunnel"></div><div class="fallLights">${lights}</div><div class="fallActor" aria-hidden="true"><div class="fallFish"><div class="fallFishGlow"></div><div class="fallFishTail"></div><div class="fallFishBody"><div class="fallFishEye"></div><div class="fallFishMouth"></div></div><div class="fallFishBubbles"><i></i><i></i><i></i><i></i></div></div></div><div class="fallHole"></div>`;document.body.appendChild(el);let done=false;const finish=()=>{if(done)return;done=true;el.remove();finishChapterFall(from,to)};setTimeout(finish,4000);setTimeout(()=>el.onclick=finish,650)}
 function finishChapterFall(from,to){chapterOverlay.classList.remove('hidden');$('chapterDoneTitle').textContent='O buraco abriu o Capítulo '+to;$('chapterDoneText').textContent='Você caiu de '+chapters[from].name+' para '+chapters[to].name+'. O próximo mapa já está esperando.';$('nextChapterBtn').textContent='Entrar no Capítulo '+to;$('nextChapterBtn').onclick=()=>{chapterOverlay.classList.add('hidden');modeRun=null;currentMode='story';startEco(to,1)} }
 const oldEcoCompleteV9=ecoComplete;
 ecoComplete=function(){const c=currentChapter,story=!modeRun,final=story&&chapters[c]&&currentEco>=chapters[c].ecos&&c<7;const r=oldEcoCompleteV9();if(final&&state==='chapterDone')setTimeout(()=>startChapterFall(c,c+1),120);return r};
@@ -4248,6 +4286,105 @@ isBlockedLine=function(x1,y1,x2,y2){if(!level||!level.walls)return false;const d
 
 const renderBeforeAdaptive=render;
 render=function(){const now=performance.now(),delta=Math.min(80,now-optLastFrameAt);optLastFrameAt=now;const r=renderBeforeAdaptive();updateAdaptiveQuality(delta);return r};
+
+
+/* ===== v9.1.2: correção definitiva de portal, seta e puzzles ===== */
+(function(){
+  function earlyStoryChapter(){return !modeRun&&!!level&&currentChapter>=1&&currentChapter<=3}
+  function puzzleGlyph(p){const sets={1:['ᚱ','✦','⌁'],2:['⚙','◷','⌖'],3:['❀','☘','❧']};const a=sets[currentChapter]||['✦'];return a[(p.type||0)%a.length]}
+
+  // Os capítulos iniciais agora atualizam proximidade e brilho como os demais capítulos.
+  const updatePuzzlesBeforeFix=updatePuzzles;
+  updatePuzzles=function(dt){
+    if(!earlyStoryChapter())return updatePuzzlesBeforeFix(dt);
+    const near=nearestInteractable();level.interactHint=near;
+    for(const p of level.puzzles){
+      if(p.done){p.hold=1.55;continue}
+      const dd=d(player.x,player.y,p.x,p.y);
+      if(dd<p.r+76)p.hold=lerp(p.hold,1,.14);
+      else p.hold=Math.max(0,p.hold-dt*.9);
+    }
+  };
+
+  // O desenho anterior ignorava os capítulos 1, 2 e 3, apesar de os puzzles existirem no mapa.
+  const drawPuzzlesBeforeFix=drawPuzzles;
+  drawPuzzles=function(){
+    drawPuzzlesBeforeFix();
+    if(!earlyStoryChapter())return;
+    const c=colors();
+    for(const p of level.puzzles){
+      if(p.done&&reveal<=0)continue;
+      if(p.x<cam.x-150||p.y<cam.y-150||p.x>cam.x+VW+150||p.y>cam.y+VH+150)continue;
+      const pulse=1+Math.sin(time*3.2+(p.type||0))*.08;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(time*.36+(p.type||0));ctx.globalCompositeOperation='lighter';
+      ctx.globalAlpha=p.done?.32:1;ctx.shadowColor=currentChapter===1?c[2]:currentChapter===2?c[3]:c[5];ctx.shadowBlur=24;
+      ctx.strokeStyle=p.done?c[2]:(currentChapter===1?c[2]:currentChapter===2?c[3]:c[5]);ctx.lineWidth=5;
+      ctx.beginPath();for(let i=0;i<8;i++){const a=i/8*Math.PI*2,rr=p.r*pulse+(i%2?10:0),x=Math.cos(a)*rr,y=Math.sin(a)*rr;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.closePath();ctx.stroke();
+      ctx.rotate(-time*.72);ctx.globalAlpha=.15+(p.hold||0)*.48;ctx.fillStyle=currentChapter===3?c[2]:c[3];ctx.beginPath();ctx.arc(0,0,p.r*(.58+(p.hold||0)*.38),0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=.98;ctx.fillStyle='#fff';ctx.shadowBlur=14;ctx.font='1000 21px ui-rounded,system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(puzzleGlyph(p),0,1);ctx.restore();
+    }
+  };
+
+  // Mostra claramente a tecla de interação nos puzzles dos capítulos iniciais.
+  const drawInteractionPromptBeforeFix=drawInteractionPrompt;
+  drawInteractionPrompt=function(){
+    if(!earlyStoryChapter())return drawInteractionPromptBeforeFix();
+    if(state!=='playing')return;const it=nearestInteractable();if(!it||it.kind!=='puzzle')return;
+    const o=it.obj,sx=o.x-cam.x,sy=o.y-cam.y;if(sx<-120||sy<-120||sx>VW+120||sy>VH+120)return;
+    ctx.save();ctx.globalCompositeOperation='source-over';ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.72)';roundRect(ctx,sx-100,sy-82,200,46,17);ctx.fill();
+    ctx.strokeStyle=currentChapter===1?'rgba(131,237,255,.62)':currentChapter===2?'rgba(255,229,138,.62)':'rgba(145,255,158,.62)';ctx.lineWidth=2;roundRect(ctx,sx-100,sy-82,200,46,17);ctx.stroke();
+    ctx.font='1000 18px ui-rounded,system-ui';ctx.fillStyle='#fff0aa';ctx.fillText('E',sx-70,sy-52);ctx.font='900 12px ui-rounded,system-ui';ctx.fillStyle='rgba(238,243,255,.96)';ctx.fillText((it.label||'Resolver puzzle').toUpperCase(),sx+24,sy-52);ctx.restore();
+  };
+
+  function storyObjectivesDone(){
+    if(!level||modeRun||level.clear)return false;
+    const orbsDone=Array.isArray(level.orbs)&&level.orbs.every(o=>o.taken);
+    const puzzlesDone=(level.puzzleDone||0)>=(level.puzzleNeed||0);
+    return orbsDone&&puzzlesDone&&!level.boss;
+  }
+
+  // Segunda verificação segura: mesmo que uma orb especial seja a última, o portal é ativado.
+  const checkClearBeforeFix=checkClear;
+  checkClear=function(){
+    const activeLevel=level;checkClearBeforeFix();
+    if(!activeLevel||level!==activeLevel||activeLevel.clear||modeRun)return;
+    if(storyObjectivesDone()&&!activeLevel.portal.active){
+      activeLevel.portal.active=true;ariadneTarget=activeLevel.portal;reveal=Math.max(reveal,.8);
+      rings.push({x:activeLevel.portal.x,y:activeLevel.portal.y,r:52,a:1,kind:'gold'});
+      toast('Objetivos completos — portal aberto');
+    }
+    if(activeLevel.portal.active&&d(player.x,player.y,activeLevel.portal.x,activeLevel.portal.y)<Math.max(90,(activeLevel.portal.r||30)+player.r+48))ecoComplete();
+  };
+
+  function drawFixedEdgeArrow(target,label,kind){
+    const sx=target.x-cam.x,sy=target.y-cam.y,ang=Math.atan2(sy-VH/2,sx-VW/2),edgeX=clamp(VW/2+Math.cos(ang)*(VW/2-54),42,VW-42),edgeY=clamp(VH/2+Math.sin(ang)*(VH/2-54),50,VH-50),pulse=1+Math.sin(time*6)*.12,c=colors();
+    ctx.save();ctx.translate(edgeX,edgeY);ctx.rotate(ang);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.94;ctx.shadowColor=kind==='portal'?c[3]:c[2];ctx.shadowBlur=22;ctx.fillStyle=kind==='portal'?c[3]:c[2];ctx.beginPath();ctx.moveTo(21*pulse,0);ctx.lineTo(-13*pulse,-11*pulse);ctx.lineTo(-7*pulse,0);ctx.lineTo(-13*pulse,11*pulse);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();ctx.rotate(-ang);ctx.font='1000 11px ui-rounded,system-ui';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(label,0,30);ctx.restore();
+  }
+
+  // Ao acabar as orbs, a seta aponta para o puzzle restante; depois aponta para o portal.
+  const drawOrbArrowsBeforeFix=drawOrbArrows;
+  drawOrbArrows=function(){
+    drawOrbArrowsBeforeFix();
+    if(state!=='playing'||!level||modeRun)return;
+    const orbsLeft=level.orbs.some(o=>!o.taken);
+    if(!orbsLeft&&!level.portal.active&&save.settings.orbGuide!==false){
+      const pending=level.puzzles.filter(p=>!p.done).sort((a,b)=>d(player.x,player.y,a.x,a.y)-d(player.x,player.y,b.x,b.y))[0];
+      if(pending)drawFixedEdgeArrow(pending,'PUZZLE','puzzle');
+    }else if(level.portal.active&&save.settings.orbGuide===false){
+      // A seta de saída é essencial e continua aparecendo mesmo com a ajuda de orbs desligada.
+      drawFixedEdgeArrow(level.portal,'PORTAL','portal');
+    }
+  };
+
+  // HUD dos capítulos 1–3 passa a mostrar a exigência real dos puzzles.
+  const updateHudBeforeFix=updateHud;let earlyHudText='';
+  updateHud=function(){
+    const r=updateHudBeforeFix();if(!earlyStoryChapter())return r;
+    const orbs=level.orbs.filter(o=>o.taken).length,base='Orbs '+orbs+'/'+level.orbCount+' • Puzzles '+level.puzzleDone+'/'+level.puzzleNeed;
+    const txt=level.boss?level.boss.name+' '+Math.max(0,Math.ceil(level.boss.hp))+'/'+level.boss.maxHp+' • '+base:level.portal.active?'PORTAL ABERTO • '+base:base;
+    if(txt!==earlyHudText){earlyHudText=txt;objectiveHud.textContent=txt}return r;
+  };
+})();
 
 const versionOpt=document.querySelector('.version');if(versionOpt)versionOpt.textContent='v9.1 • otimização adaptativa + visual preservado';
 
